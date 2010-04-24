@@ -1,0 +1,19 @@
+all:
+  inline_object:
+
+    # Specify the array of inline object types that can be embedded
+    # For example, the below example would process the [asset:name] syntax
+    # through the sfInlineAssetObject class
+    
+    # types:
+    #   asset:     sfInlineAssetObject
+
+
+    # Configuration for the "sfInlineObjectTemplate" Doctrine behavior
+    # For some model that uses inline objects, this maps a type to a true
+    # relation so that the relation can be used instead of querying for
+    # the foreign objects
+
+    # relations:
+    #   MyModel:
+    #     asset:    Assets
