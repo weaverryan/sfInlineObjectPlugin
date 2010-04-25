@@ -101,7 +101,7 @@ class sfInlineObjectDoctrineResource
   /**
    * Clears all of the instances
    */
-  public static clearInstances()
+  public static function clearInstances()
   {
     self::$_instances = array();
   }
