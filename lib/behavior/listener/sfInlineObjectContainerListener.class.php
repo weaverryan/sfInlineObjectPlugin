@@ -10,14 +10,27 @@
 
 class sfInlineObjectContainerListener extends Doctrine_Record_Listener
 {
-  public function postInsert(Doctrine_Event $event)
+  protected $_options = array();
+  
+  public function __construct(array $options)
   {
-    $event->getInvoker()->deleteLinkAndAssetReferences();
+    $this->_options = $options;
   }
 
+  /**
+   * Clear the related inline objects on insert
+   */
+  public function postInsert(Doctrine_Event $event)
+  {
+    $event->getInvoker()->_deleteInlineObjectReferences($event);
+  }
+
+  /**
+   * Clear the related inline objects on update
+   */
   public function postUpdate(Doctrine_Event $event)
   {
-    $event->getInvoker()->deleteLinkAndAssetReferences();
+    $event->getInvoker()->_deleteInlineObjectReferences($event);
   }
 
   /**
@@ -30,12 +43,7 @@ class sfInlineObjectContainerListener extends Doctrine_Record_Listener
    */
   protected function _deleteInlineObjectReferences(Doctrine_Event $event)
   {
-    $modelConfig = sfConfig::get('app_inline_object_relations', array());
-    $modelName = get_clas($event->getInvoker());
-
-    // Find the array of relations on this model that are InlineObject relations
-    $relations = isset($models[$modelName]) ? $models[$modelName] : array();
-    foreach ($relations as $relation)
+    foreach ($this->options['relations'] as $relation)
     {
       // Unlink ALL related objects on the given relation
       $event->getInvoker()->unlink($relation, array(), true);

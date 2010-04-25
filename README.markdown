@@ -141,6 +141,7 @@ First, define the many-to-many relationship:
           foreign: product_id
       actAs:
         sfInlineObjectContainer:
+          relations:    [Products]
     
     BlogProduct:
       columns:

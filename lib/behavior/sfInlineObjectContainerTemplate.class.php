@@ -11,12 +11,14 @@
 
 class sfInlineObjectContainerTemplate extends Doctrine_Template
 {
-
+  protected $_options = array(
+    'relations' => array();
+  );
   /**
    * Set the table definition for sfInlineObjectTemplate
    */
   public function setTableDefinition()
   {
-    $this->addListener(new sfInlineObjectContainerListener());
+    $this->addListener(new sfInlineObjectContainerListener($this->_options));
   }
 }
