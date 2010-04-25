@@ -9,7 +9,7 @@
  * @author      Ryan Weaver <ryan@thatsquality.com>
  */
 
-class sfInlineObjectTemplate extends Doctrine_Template
+class sfInlineObjectContainerTemplate extends Doctrine_Template
 {
 
   /**
@@ -17,6 +17,6 @@ class sfInlineObjectTemplate extends Doctrine_Template
    */
   public function setTableDefinition()
   {
-    $this->addListener(new sfInlineObjectTemplateListener());
+    $this->addListener(new sfInlineObjectContainerListener());
   }
 }

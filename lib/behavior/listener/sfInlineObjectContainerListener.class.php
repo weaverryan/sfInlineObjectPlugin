@@ -8,7 +8,7 @@
  * @author      Ryan Weaver <ryan@thatsquality.com>
  */
 
-class sfInlineObjectTemplateListener extends Doctrine_Record_Listener
+class sfInlineObjectContainerListener extends Doctrine_Record_Listener
 {
   public function postInsert(Doctrine_Event $event)
   {
