@@ -158,10 +158,6 @@ a new `relations` configuration.
         types:
           product:  InlineObjectProduct
 
-        relations:
-          Product:
-            Blog:     Products
-
 The `relations` key tells the parser to use the `Products` relationship
 on `Blog` to retrieve `Product` records instead of querying for them directly.
 
