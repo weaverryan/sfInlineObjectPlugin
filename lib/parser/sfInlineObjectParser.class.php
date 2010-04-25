@@ -87,14 +87,14 @@ class sfInlineObjectParser extends InlineObjectParser
         $resources[$typeClass] = sfInlineObjectDoctrineRelatedResource::getInstance(
           $this->_doctrineRecord,
           $relationConfig[get_class($this->_doctrineRecord)],
-          $doctrineType['keyColumn'],
+          $doctrineType['keyColumn']
         );
       }
       else
       {
         $resources[$typeClass] = new sfInlineObjectDoctrineResource(
           $doctrineType['model'],
-          $doctrineType['keyColumn'],
+          $doctrineType['keyColumn']
         );
       }
       
