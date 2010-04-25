@@ -195,3 +195,15 @@ To configure the cache, edit your `app.yml` file:
           class:    sfFileCache
           options:
             cache_dir:  <?php echo sfConfig::get('sf_app_cache_dir') ?>/inline_objects
+
+The Fine Details
+----------------
+
+This plugin was taken from [sympal CMF](http://www.sympalphp.org) and was
+developed by both Jon Wage and Ryan Weaver.
+
+This plugins uses the [InlineObjectParser](http://github.com/weaverryan/InlineObjectParser)
+library.
+
+If you have questions, comments or anything else, email me at ryan [at] thatsquality.com
+
