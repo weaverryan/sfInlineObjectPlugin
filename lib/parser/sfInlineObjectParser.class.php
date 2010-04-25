@@ -67,7 +67,7 @@ class sfInlineObjectParser extends InlineObjectParser
           );
         }
         
-        $doctrineTypes[$className]['keys'] = $object->getName();
+        $doctrineTypes[$className]['keys'][] = $object->getName();
       }
     }
     
