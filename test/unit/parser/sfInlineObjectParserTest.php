@@ -2,7 +2,7 @@
 
 require dirname(__FILE__).'/../../bootstrap/doctrine.php';
 
-$t = new lime_test(18);
+$t = new lime_test(21);
 Doctrine_Core::getTable('Product')->createQuery('p')->delete()->execute();
 Doctrine_Core::getTable('Blog')->createQuery('p')->delete()->execute();
 Doctrine_Core::getTable('BlogProduct')->createQuery('p')->delete()->execute();
@@ -12,11 +12,16 @@ $t->info('1 - Test some configuration setup');
 $parser = new sfInlineObjectParser();
 $t->is(get_class($parser->getCacheDriver()), 'sfFileCache', 'The cache driver is set automatically with config');
 
+$cacheConfig = sfConfig::get('app_inline_object_cache');
 $cacheConfig['enabled'] = false;
 sfConfig::set('app_inline_object_cache', $cacheConfig);
 
 $parser = new sfInlineObjectParser();
 $t->is($parser->getCacheDriver(), null, 'The cache driver is null if caching is not enabled');
+
+// Re-enable the cache
+$cacheConfig['enabled'] = true;
+sfConfig::set('app_inline_object_cache', $cacheConfig);
 
 $types = $parser->getTypes();
 $t->is(count($types), 2, 'The parser begins with the 2 types set in the config');
@@ -92,3 +97,22 @@ $blog->body = 'The price of "[product:my-product]": [product:my-product display=
 $blog->save();
 $result = $parser->parse($blog->body);
 $t->is($result, 'The price of "My Product": 15.99 and "Foo Product": 30.59.', 'Both products where translated');
+
+
+$t->info('4 - Test caching');
+$result = $parser->parse('Showing info about "[product:foo-product]"', 'foo_cache_key');
+$t->is($result, 'Showing info about "Foo Product"', 'Processing takes place as expected.');
+
+$result = $parser->parse('Showing price of "[product:foo-product]"', 'foo_cache_key');
+$t->is($result, 'Showing info about "Foo Product"', 'The cached version is returned.');
+
+$product2->title = 'Bar Product';
+$product2->save();
+
+$result = $parser->parse('Showing price of "[product:foo-product]"', 'foo_cache_key');
+$t->is($result, 'Showing info about "Bar Product"', 'The text is cached, but the object remains dynamic');
+
+
+
+
+
