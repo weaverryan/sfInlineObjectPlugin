@@ -194,4 +194,4 @@ To configure the cache, edit your `app.yml` file:
           enabled:  true
           class:    sfFileCache
           options:
-            cache_dir:  SF_APP_CACHE_DIR/inline_objects
+            cache_dir:  <?php echo sfConfig::get('sf_app_cache_dir') ?>/inline_objects
