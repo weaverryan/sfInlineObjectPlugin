@@ -43,7 +43,7 @@ class sfInlineObjectContainerListener extends Doctrine_Record_Listener
    */
   protected function _deleteInlineObjectReferences(Doctrine_Event $event)
   {
-    foreach ($this->options['relations'] as $relation)
+    foreach ($this->_options['relations'] as $relation)
     {
       // Unlink ALL related objects on the given relation
       $event->getInvoker()->unlink($relation, array(), true);
