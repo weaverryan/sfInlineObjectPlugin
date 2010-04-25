@@ -30,7 +30,7 @@ class sfInlineObjectParser extends InlineObjectParser
       sfConfig::get('app_inline_object_types', array()),
       $types
     );
-    
+
     parent::__construct($types);
   }
 
@@ -71,7 +71,6 @@ class sfInlineObjectParser extends InlineObjectParser
       }
     }
     
-    $relationsConfig = sfConfig::get('app_inline_object_relations');
     $resources = array();
 
     /*
@@ -80,13 +79,11 @@ class sfInlineObjectParser extends InlineObjectParser
      */
     foreach ($doctrineTypes as $typeClass => $doctrineType)
     {
-      $relationConfig = isset($relationsConfig[$doctrineType['model']]) ? $relationsConfig[$doctrineType['model']] : array();
-
-      if ($this->_doctrineRecord && isset($relationConfig[get_class($this->_doctrineRecord)]))
+      if ($this->_doctrineRecord && $relation = $this->getRelation(get_class($this->_doctrineRecord), $doctrineType['model']))
       {
         $resources[$typeClass] = sfInlineObjectDoctrineRelatedResource::getInstance(
           $this->_doctrineRecord,
-          $relationConfig[get_class($this->_doctrineRecord)],
+          $relation,
           $doctrineType['keyColumn']
         );
       }
@@ -186,5 +183,36 @@ class sfInlineObjectParser extends InlineObjectParser
       $cache = new $class($args);
       $this->setCacheDriver($cache);
     }
+  }
+
+  /**
+   * Returns the relation name (if one exists) that will allow us to retrieve
+   * objects of the targetModel from the sourceModel.
+   * 
+   * So, if a Blog model embeds many Product objects and there is a
+   * many-to-many relationship called Blog->Products, then
+   * 
+   * echo $this->getRelation('Blog', 'Product'); // returns 'Products'
+   */
+  public function getRelation($sourceModel, $targetModel)
+  {
+    $tbl = Doctrine_Core::getTable($sourceModel);
+    $template = $tbl->getTemplate('sfInlineObjectContainerTemplate');
+    
+    if (!$template)
+    {
+      return false;
+    }
+
+    $relations = $template->getOption('relations');
+    foreach ($relations as $relation)
+    {
+      if ($tbl->getRelation($relation)->getClass() == $targetModel)
+      {
+        return $relation;
+      }
+    }
+    
+    return false;
   }
 }
