@@ -126,13 +126,13 @@ First, define the many-to-many relationship:
         title:    string(255)
         body:     clob
       relations:
-        Products
+        Products:
           class: Product
           refClass: BlogProduct
           local: blog_id
           foreign: product_id
       actAs:
-        sfInlineObjectContainer:
+        sfInlineObjectContainerTemplate:
           relations:    [Products]
     
     BlogProduct:
@@ -144,7 +144,7 @@ First, define the many-to-many relationship:
           type:     integer
           primary:  true
 
-Note that the `Blog` model uses the `sfInlineObjectContainer` behavior.
+Note that the `Blog` model uses the `sfInlineObjectContainerTemplate` behavior.
 This enforces garbage collection which removes old `Product` objects from the
 `Products` relation.
 
