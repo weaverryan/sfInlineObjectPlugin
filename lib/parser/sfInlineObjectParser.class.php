@@ -15,6 +15,12 @@ class sfInlineObjectParser extends InlineObjectParser
     $_cacheDriver;
 
   /**
+   * @var Doctrine_Record An optional record that the inline objects relate to
+   */
+  protected
+    $_doctrineRecord;
+
+  /**
    * Overridden to read the types from config
    */
   public function __construct($types = array())
@@ -26,6 +32,89 @@ class sfInlineObjectParser extends InlineObjectParser
     );
     
     parent::__construct($types);
+  }
+
+  /**
+   * Overridden to allow for extra setup to be done to support efficient
+   * querying for inline objects that refer to Doctrine objects
+   * 
+   * @see InlineObjectParser
+   */
+  public function parse($text, $key = null)
+  {
+    // Parse the string to retrieve tokenized text and an array of InlineObjects
+    $parsed = $this->parseTypes($text, $key);
+    
+    $text = $parsed[0];
+    $objects = $parsed[1];
+
+    /*
+     * Iterate through all of the inline objects and collect a list of the
+     * Doctrine inline objects and their keys
+     */
+    $doctrineTypes = array();
+    foreach ($objects as $object)
+    {
+      if ($object instanceof sfInlineObjectDoctrineType)
+      {
+        $className = get_class($object);
+        if (!isset($doctrineTypes[$className]))
+        {
+          $doctrineTypes[$className] = array(
+            'model'     => $object->getModel(),
+            'keyColumn' => $object->getKeyColumn(),
+            'keys'      => array(),
+          );
+        }
+        
+        $doctrineTypes[$className]['keys'] = $object->getName();
+      }
+    }
+    
+    $relationsConfig = sfConfig::get('app_inline_object_relations');
+    $resources = array();
+
+    /*
+     * Iterate through all of the Doctrine types and instantiate the resource
+     * that will be used to retrieve those doctrine objects
+     */
+    foreach ($doctrineTypes as $typeClass => $doctrineType)
+    {
+      $relationConfig = isset($relationsConfig[$doctrineType['model']]) ? $relationsConfig[$doctrineType['model']] : array();
+
+      if ($this->_doctrineRecord && isset($relationConfig[get_class($this->_doctrineRecord)]))
+      {
+        $resources[$typeClass] = sfInlineObjectDoctrineRelatedResource::getInstance(
+          $this->_doctrineRecord,
+          $relationConfig[get_class($this->_doctrineRecord)],
+          $doctrineType['keyColumn'],
+        );
+      }
+      else
+      {
+        $resources[$typeClass] = new sfInlineObjectDoctrineResource(
+          $doctrineType['model'],
+          $doctrineType['keyColumn'],
+        );
+      }
+      
+      $resources[$typeClass]->prepareObjects($doctrineType['keys']);
+    }
+    
+    /*
+     * Iterate through all of the objects and assign resources where necessary
+     */
+    $renderedObjects = array();
+    foreach ($objects as $object)
+    {
+      if ($object instanceof sfInlineObjectDoctrineType)
+      {
+        $object->setDoctrineResource($resources[get_class($object)]);
+      }
+      $renderedObjects[] = $object->render();
+    }
+
+    return $this->_combineTextAndRenderedObjects($text, $renderedObjects);
   }
 
   /**
@@ -66,6 +155,20 @@ class sfInlineObjectParser extends InlineObjectParser
     {
       return $this->_cacheDriver->set($key, $data);
     }
+  }
+
+  /**
+   * Sets the Doctrine_Record that relates to inline objects.
+   * 
+   * If this is set, and inline objects that refer to foreign Doctrine objects
+   * will attempt to retrieve those objects through a true relationship
+   * on the given Doctrine_Record
+   * 
+   * @param Doctrine_Record $record The record that sources the raw text
+   */
+  public function setDoctrineRecord(Doctrine_Record $record)
+  {
+    $this->_doctrineRecord = $record;
   }
 
   /**
