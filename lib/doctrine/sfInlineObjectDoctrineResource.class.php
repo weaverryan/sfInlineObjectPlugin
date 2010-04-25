@@ -1,169 +1,84 @@
 <?php
 
 /**
- * Internal utility class that helps retrieve foreign Doctrine relations
- * 
- * Given a Doctrine_Record instance and a hasMany relation name, one can
- * ask this object for individual records from that collection by some
- * identifier. If a record of a particular identifier doesn't exist on
- * the collection, it will be added.
- * 
- * Effectively, this allows for individual records from a hasMany() relationship
- * to be retrieved without additional queries (since it goes through the
- * real relationship).
+ * Class that assist in querying for a group of objects in as efficient
+ * manner as possible
  * 
  * @package     sfInlineObjectPlugin
  * @subpackage  doctrine
  * @author      Ryan Weaver <ryan@thatsquality.com>
- * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
-
 class sfInlineObjectDoctrineResource
 {
   protected
-    $_record,
-    $_relation,
-    $_field;
+    $_model,
+    $_keyColumn;
 
   protected
     $_objects;
-  
-  protected static
-    $_instances = array();
 
   /**
    * Class constructor
    */
-  public function __construct(Doctrine_Record $record, $relation, $field)
+  public function __construct($model, $keyColumn)
   {
-    $this->_record = $record;
-    $this->_relation = $relation;
-    $this->_field = $field;
+    $this->_model = $model;
+    $this->_keyColumn = $keyColumn;
   }
 
   /**
-   * Retrieves an array of objects based off of their names.
+   * Retrieves an array of objects based off of their keys.
    * 
-   * The name should correspond to the field given when constructing this resource
+   * The key should correspond to the keyColumn given when constructing this resource
    * 
-   * @param string $name The name/id of the slug to retrieve
+   * @param array() $keys The keys of the objects that should be prepared
    */
-  public function prepareObjects($names)
+  public function prepareObjects($keys)
   {
-    $objects = $this->_getObjects($names);
+    $objects = $this->_getObjects($keys);
     $this->_objects = $this->_buildObjectArray($objects);
   }
 
   /**
-   * Returns a foreign object identified by the given name
+   * Returns a foreign object identified by the given key
    * 
    * This must be called after prepareObjects(), else newly related objects
    * may not be returned correctly
    * 
    * @return Doctrine_Record or null
    */
-  public function getObject($name)
+  public function getObject($key)
   {
     if ($this->_objects === null)
     {
       throw new sfException('->prepareObjects() should be called before getObject()');
     }
 
-    return isset($this->_objects[$name]) ? $this->_objects[$name] : null;
+    return isset($this->_objects[$key]) ? $this->_objects[$key] : null;
   }
 
   /**
-   * Retrieves an instance based on the modelName and relationName
+   * This queries and returns a collection of records based on the given keys
    * 
-   * @param Doctrine_Record $record   The record from which to retrieve the foreign objects
-   * @param string          $relation The name of the relation to use for retrieving the objects
-   * @param string          $field    The name of the field that's used as the "identifier" or "name"
-   * 
-   * @return sfInlineObjectResource
+   * @param array $keys The array of keys to use when querying for the objects
    */
-  public function getInstance(Doctrine_Record $record, $relation, $field)
+  protected function _getObjects($keys)
   {
-    $instanceName = sprintf('%s_%s_%s', get_class($record), $record->id, $relation);
-    
-    if (!isset(self::$_instances[$instanceName]))
-    {
-      $instance = new self($record, $relation, $field);
-      
-      self::$_instances[$instanceName] = $instance;
-    }
-    
-    return self::$_instances[$instanceName];
-  }
-
-  /**
-   * Given an array of names, this creates any new links from the $_record
-   * variable to the foreign relation and then returns all objects in the
-   * foreign relation.
-   * 
-   * This ensures that all foreign objects we're looking for are set on
-   * the relation
-   */
-  protected function _getObjects($names)
-  {
-    $currentObjects = $this->record->get($this->_relation);
-    $currentNames = $this->_getNamesFromCollection($currentObjects);
-    asort($names);
-
-    if (array_diff($names, $currentNames) || array_diff($currentNames, $names))
-    {
-      $objects = $this->_getQueryForObjects($names)->execute();
-
-      $ids = array();
-      foreach ($objects as $object)
-      {
-        $ids[] = $object->id;
-      }
-      
-      $this->_record->link($this->_relation, $ids);
-      //$this->_record->disableSearchIndexUpdateForSave();
-      $this->_record->save();
-    }
-
-    return $this->_record->get($this->_relation);
-  }
-
-  /**
-   * Helper to retrieve an array of names/ids from a doctrine collection
-   * 
-   * @param Doctrine_Collection $collection
-   * @return array
-   */
-  protected function _getNamesFromCollection(Doctrine_Collection $collection)
-  {
-    $names = array();
-    foreach ($collection as $object)
-    {
-      $names[] = $object->get($this->_field);
-    }
-
-    return $names;
+    return $this->_getQueryForObjects($keys)->execute();
   }
 
   /**
    * Returns the query that should be used if we need to query out
    * and get a collection of the foreign objects
    */
-  protected function _getQueryForObjects($names)
+  protected function _getQueryForObjects($keys)
   {
-    $q = Doctrine_Core::getTable($this->_getForeignModelName())
+    $q = Doctrine_Core::getTable($this->_model)
       ->createQuery('a')
-      ->whereIn('a.'.$this->_field, array_unique($names))
-      ->orderBy('a.'.$this->_field.' ASC');
+      ->whereIn('a.'.$this->_keyColumn, array_unique($keys))
+      ->orderBy('a.'.$this->_keyColumn.' ASC');
 
     return $q;
-  }
-
-  /**
-   * Returns the model name of the foreign objects that we're retrieving
-   */
-  protected function _getForeignModelName()
-  {
-    return $this->_record->getTable()->getRelation($this->_relation)->getClass();
   }
 
   /**
@@ -177,9 +92,17 @@ class sfInlineObjectDoctrineResource
     $objects = new Doctrine_Collection($collection->getTable());
     foreach ($collection as $object)
     {
-      $objects[$object->get($this->_field)] = $object;
+      $objects[$object->get($this->_keyColumn)] = $object;
     }
 
     return $objects;
+  }
+
+  /**
+   * Clears all of the instances
+   */
+  public static clearInstances()
+  {
+    self::$_instances = array();
   }
 }
