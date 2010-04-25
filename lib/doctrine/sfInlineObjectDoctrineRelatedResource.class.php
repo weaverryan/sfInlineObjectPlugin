@@ -73,11 +73,11 @@ class sfInlineObjectDoctrineRelatedResource extends sfInlineObjectDoctrineResour
    */
   protected function _getObjects($keys)
   {
-    $currentObjects = $this->record->get($this->_relation);
+    $currentObjects = $this->_record->get($this->_relation);
     $currentKeys = $this->_getKeysFromCollection($currentObjects);
-    asort($names);
+    asort($keys);
 
-    if (array_diff($names, $currentKeys) || array_diff($currentKeys, $keys))
+    if (array_diff($keys, $currentKeys) || array_diff($currentKeys, $keys))
     {
       $objects = $this->_getQueryForObjects($keys)->execute();
 
@@ -103,12 +103,12 @@ class sfInlineObjectDoctrineRelatedResource extends sfInlineObjectDoctrineResour
    */
   protected function _getKeysFromCollection(Doctrine_Collection $collection)
   {
-    $names = array();
+    $keys = array();
     foreach ($collection as $object)
     {
-      $names[] = $object->get($this->_field);
+      $keys[] = $object->get($this->_field);
     }
 
-    return $names;
+    return $keys;
   }
 }
