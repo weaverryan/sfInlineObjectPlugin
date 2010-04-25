@@ -81,7 +81,7 @@ When defining an inline object type that represents a foreign Doctrine object,
 the class should extend `sfInlineObjectDoctrineType` instead of `sfInlineObjectDoctrine`.
 You'll need to define two new methods, `getModel()` and `getKeyColumn()`:
 
-    class InlineObjectProduct extends sfInlineObjectDoctrine
+    class InlineObjectProduct extends sfInlineObjectDoctrineType
     {
       public function getModel()
       {
