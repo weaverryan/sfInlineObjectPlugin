@@ -1,30 +1,12 @@
 <?php
 
-if (!isset($_SERVER['SYMFONY']))
-{
-  throw new RuntimeException('Could not find symfony core libraries.');
-}
-
-require_once $_SERVER['SYMFONY'].'/autoload/sfCoreAutoload.class.php';
-sfCoreAutoload::register();
-
-$configuration = new sfProjectConfiguration(dirname(__FILE__).'/../fixtures/project');
+require_once dirname(__FILE__).'/../fixtures/project/config/ProjectConfiguration.class.php';
+$configuration = new ProjectConfiguration(dirname(__FILE__).'/../fixtures/project');
 require_once $configuration->getSymfonyLibDir().'/vendor/lime/lime.php';
 
-function sfInlineObjectPlugin_autoload_again($class)
-{
-  $autoload = sfSimpleAutoload::getInstance();
-  $autoload->reload();
-  return $autoload->autoload($class);
-}
-spl_autoload_register('sfInlineObjectPlugin_autoload_again');
-
-if (file_exists($config = dirname(__FILE__).'/../../config/sfInlineObjectPluginConfiguration.class.php'))
-{
-  require_once $config;
-  $plugin_configuration = new sfInlineObjectPluginConfiguration($configuration, dirname(__FILE__).'/../..', 'sfInlineObjectPlugin');
-}
-else
-{
-  $plugin_configuration = new sfPluginConfigurationGeneric($configuration, dirname(__FILE__).'/../..', 'sfInlineObjectPlugin');
-}
+$autoload = sfSimpleAutoload::getInstance(sfConfig::get('sf_cache_dir').'/project_autoload.cache');
+$autoload->loadConfiguration(sfFinder::type('file')->name('autoload.yml')->in(array(
+  sfConfig::get('sf_symfony_lib_dir').'/config/config',
+  sfConfig::get('sf_config_dir'),
+)));
+$autoload->register();
