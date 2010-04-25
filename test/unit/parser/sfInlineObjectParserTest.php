@@ -23,4 +23,4 @@ $cacheConfig['enabled'] = false;
 sfConfig::set('app_inline_object_cache', $cacheConfig);
 
 $parser = new sfInlineObjectParser();
-$t->is($parser->getCacheDriver(), null, 'The cache driver is null of caching is not enabled');
+$t->is($parser->getCacheDriver(), null, 'The cache driver is null if caching is not enabled');
