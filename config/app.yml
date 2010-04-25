@@ -2,18 +2,27 @@ all:
   inline_object:
 
     # Specify the array of inline object types that can be embedded
-    # For example, the below example would process the [asset:name] syntax
-    # through the sfInlineAssetObject class
+    # For example, the below example would process the [photo:name] syntax
+    # through the InlineObjectPhoto class.
     
     # types:
-    #   asset:     sfInlineAssetObject
+    #   photo:
+    #     class: InlineObjectPhoto
 
 
-    # Configuration for the "sfInlineObjectTemplate" Doctrine behavior
-    # For some model that uses inline objects, this maps a type to a true
-    # relation so that the relation can be used instead of querying for
-    # the foreign objects
+    # If inline object relates to a Doctrine model, use the relations key
+    # to define a relation to use when retrieving those objects.
 
-    # relations:
-    #   MyModel:
-    #     asset:    Assets
+    #   product:
+    #     class:  InlineObjectProduct
+    #     column: slug                       # The "name" will query on this column
+    #     model:  Product                    # The foreign model name.
+    #     relations:
+    #       MyModel:      Products
+    #       AnotherModel: RelatedProducts
+
+    cache:
+      enabled:  true
+      class:    sfFileCache
+      options:
+        cache_dir:  SF_APP_CACHE_DIR/inline_objects
