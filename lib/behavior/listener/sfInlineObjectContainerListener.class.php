@@ -22,7 +22,7 @@ class sfInlineObjectContainerListener extends Doctrine_Record_Listener
    */
   public function postInsert(Doctrine_Event $event)
   {
-    $event->getInvoker()->_deleteInlineObjectReferences($event);
+    $this->_deleteInlineObjectReferences($event);
   }
 
   /**
@@ -30,7 +30,7 @@ class sfInlineObjectContainerListener extends Doctrine_Record_Listener
    */
   public function postUpdate(Doctrine_Event $event)
   {
-    $event->getInvoker()->_deleteInlineObjectReferences($event);
+    $this->_deleteInlineObjectReferences($event);
   }
 
   /**
