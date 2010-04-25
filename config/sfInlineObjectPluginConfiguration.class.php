@@ -3,11 +3,11 @@
 /**
  * Plugin configuration for sfSympalInlineObjectPlugin
  * 
- * @package     sfSympalInlineObjectPlugin
+ * @package     sfInlineObjectPlugin
  * @subpackage  config
  * @author      Ryan Weaver <ryan@thatsquality.com>
  */
-class sfSympalInlineObjectPluginConfiguration extends sfPluginConfiguration
+class sfInlineObjectPluginConfiguration extends sfPluginConfiguration
 {
   public function initialize()
   {
