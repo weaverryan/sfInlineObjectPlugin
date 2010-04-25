@@ -43,9 +43,9 @@ abstract class sfInlineObjectDoctrineType extends sfInlineObjectType
   {
     if ($this->_relatedObject === null)
     {
-      if ($this->doctrineResource)
+      if ($this->_doctrineResource)
       {
-        $this->_relatedObject = $this->doctrineResource->getObject($this->getName());
+        $this->_relatedObject = $this->_doctrineResource->getObject($this->getName());
       }
       else
       {
