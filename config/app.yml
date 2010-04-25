@@ -6,20 +6,18 @@ all:
     # through the InlineObjectPhoto class.
     
     # types:
-    #   photo:
-    #     class: InlineObjectPhoto
+    #   photo:     InlineObjectPhoto
 
 
     # If inline object relates to a Doctrine model, use the relations key
     # to define a relation to use when retrieving those objects.
 
-    #   product:
-    #     class:  InlineObjectProduct
-    #     column: slug                       # The "name" will query on this column
-    #     model:  Product                    # The foreign model name.
-    #     relations:
-    #       MyModel:      Products
-    #       AnotherModel: RelatedProducts
+    #   product:   InlineObjectProduct
+    # 
+    # relations:
+    #   Product:
+    #     MyModel:      Products
+    #     AnotherModel: RelatedProducts
 
     cache:
       enabled:  true

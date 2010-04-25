@@ -22,7 +22,7 @@ Once you've defined your object types (see below), using the plugin couldn't
 be easier:
 
     $parser = new sfInlineObjectParser();
-    echo $parser->render('A picture of a flower: [photo:flower width=100].');
+    echo $parser->parse('A picture of a flower: [photo:flower width=100].');
     
     // Example output
     A picture of a flower: <img src="/images/flower.jpg" width="100" />
@@ -36,8 +36,7 @@ create a class to render it:
     all:
       inline_object:
         types:
-          photo:
-            class: InlineObjectPhoto
+          photo: InlineObjectPhoto
 
 The class that renders the syntax must extend the abstract class `sfInlineObjectType`.
 The only method that needs to be defined is `render()`:
@@ -77,31 +76,21 @@ on its data. This can be done quite easily.
 ### The simple setup
 
 When defining an inline object type that represents a foreign Doctrine object,
-be sure to set the following configuration:
+the class should extend `sfInlineObjectDoctrineType` instead of `sfInlineObjectDoctrine`.
+You'll need to define two new methods, `getModel()` and `getKeyColumn()`:
 
-    all:
-      inline_object:
-        types:
-          product:
-            class:  InlineObjectProduct
-            column: slug
-            model:  Product
-
-The two new configuration options are:
-
- * `column`
-
-   The column that is used when forming the query to retrieve an object.
-
- * `model`
-
-   The name of the foreign model that the inline object represents
-
-Inside `InlineObjectProduct`, you a now access a new method, `getRelatedObject()`
-that will return the related instance represented by the inline object:
-
-    class InlineObjectProduct extends sfInlineObjectType
+    class InlineObjectProduct extends sfInlineObjectDoctrine
     {
+      public function getModel()
+      {
+        return 'Product';
+      }
+      
+      public function getKeyColumn()
+      {
+        return 'slug';
+      }
+      
       public function render()
       {
         $product = $this->getRelatedObject();
@@ -109,6 +98,9 @@ that will return the related instance represented by the inline object:
         // ...
       }
     }
+
+Inside `InlineObjectProduct`, you now have access to a new method, `getRelatedObject()`
+that will return the related instance represented by the inline object:
 
 This will attempt to minimize the number of queries needed as much as possible.
 Still, each string that's parsed will need one extra query per inline object type.
@@ -162,22 +154,21 @@ a new `relations` configuration.
     all:
       inline_object:
         types:
-          product:
-            class:  InlineObjectProduct
-            column: slug
-            model:  Product
-            relations:
-              Blog:    Products
+          product:  InlineObjectProduct
+
+        relations:
+          Product:
+            Blog:     Products
 
 The `relations` key tells the parser to use the `Products` relationship
 on `Blog` to retrieve `Product` records instead of querying for them directly.
 
-Using the parser itself requires one extra step:
+Using the parser itself requires just one extra step:
 
     $blog = Doctrine_Core::getTable('Blog')->find(1);
     $parser = new sfInlineObjectParser();
     $parser->setDoctrineRecord($blog);
-    echo $parser->render($blog->body);
+    echo $parser->parse($blog->body);
 
 Caching
 -------
@@ -190,7 +181,7 @@ can be cached.
     $cacheKey = 'product_price_description';
 
     $parser = new sfInlineObjectParser();
-    echo $parser->render($text, $cache_key);
+    echo $parser->parse($text, $cache_key);
 
 The parsing of the string will occur once and then be cached. Only the
 string parsing is cached, so if the inline object itself refers to a dynamic
