@@ -14,8 +14,11 @@ Blog:
 
 Product:
   columns:
-    title:   string(255)
-    price:   double
+    title:    string(255)
+    price:    double
+  actAs:
+    Sluggable:
+      fields: [title]
 
 BlogProduct:
   columns:
