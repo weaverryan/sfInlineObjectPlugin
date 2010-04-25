@@ -139,7 +139,7 @@ class sfInlineObjectParser extends InlineObjectParser
   {
     if ($this->_cacheDriver)
     {
-      return $this->_cacheDriver->get($key);
+      return unserialize($this->_cacheDriver->get($key));
     }
   }
 
@@ -150,7 +150,7 @@ class sfInlineObjectParser extends InlineObjectParser
   {
     if ($this->_cacheDriver)
     {
-      return $this->_cacheDriver->set($key, $data);
+      return $this->_cacheDriver->set($key, serialize($data));
     }
   }
 
