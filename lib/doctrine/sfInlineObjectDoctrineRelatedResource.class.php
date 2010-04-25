@@ -36,7 +36,7 @@ class sfInlineObjectDoctrineRelatedResource extends sfInlineObjectDoctrineResour
     $this->_relation = $relation;
     
     $model = $this->_record->getTable()->getRelation($this->_relation)->getClass();
-    
+
     parent::__construct($model, $keyColumn);
   }
 
@@ -106,7 +106,7 @@ class sfInlineObjectDoctrineRelatedResource extends sfInlineObjectDoctrineResour
     $keys = array();
     foreach ($collection as $object)
     {
-      $keys[] = $object->get($this->_field);
+      $keys[] = $object->get($this->_keyColumn);
     }
 
     return $keys;
