@@ -14,5 +14,7 @@ class ProjectConfiguration extends sfProjectConfiguration
   {
     $this->setPlugins(array('sfInlineObjectPlugin'));
     $this->setPluginPath('sfInlineObjectPlugin', dirname(__FILE__).'/../../../..');
+    
+    $this->enablePlugins(array('sfDoctrinePlugin'));
   }
 }
