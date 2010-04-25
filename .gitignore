@@ -2,3 +2,4 @@ base
 
 test/fixtures/project/cache
 test/fixtures/project/log
+test/fixtures/project/data/sql
