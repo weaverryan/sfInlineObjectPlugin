@@ -45,7 +45,9 @@ The only method that needs to be defined is `render()`:
     {
       public function render()
       {
-        return image_tag($this->getName().'.jpg', $this->getOptions());
+        $attrs = InlineObjectToolkit::arrayToAttributes($this->getOptions());
+
+        return sprintf('<img src="/images/%s.jpg"%s />', $this->getName(), $attrs);
       }
     }
 
