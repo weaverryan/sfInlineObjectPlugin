@@ -12,7 +12,7 @@
 class sfInlineObjectContainerTemplate extends Doctrine_Template
 {
   protected $_options = array(
-    'relations' => array();
+    'relations' => array(),
   );
   /**
    * Set the table definition for sfInlineObjectTemplate
