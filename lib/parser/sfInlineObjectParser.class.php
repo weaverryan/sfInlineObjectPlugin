@@ -56,6 +56,14 @@ class sfInlineObjectParser extends InlineObjectParser
   }
 
   /**
+   * Returns the cache driver
+   */
+  public function getCacheDriver()
+  {
+    return $this->_cacheDriver;
+  }
+
+  /**
    * @see InlineObjectParser
    */
   public function getCache($key)
