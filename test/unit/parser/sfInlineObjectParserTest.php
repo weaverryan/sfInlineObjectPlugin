@@ -2,7 +2,7 @@
 
 require dirname(__FILE__).'/../../bootstrap/doctrine.php';
 
-$t = new lime_test(21);
+$t = new lime_test(22);
 Doctrine_Core::getTable('Product')->createQuery('p')->delete()->execute();
 Doctrine_Core::getTable('Blog')->createQuery('p')->delete()->execute();
 Doctrine_Core::getTable('BlogProduct')->createQuery('p')->delete()->execute();
@@ -35,6 +35,8 @@ $parser = new sfInlineObjectParser();
 $result = $parser->parse('A [photo:flower width=100] flower');
 $t->is($result, 'A <img src="/images/flower.jpg" width="100" /> flower', 'A simple InlineObject translates correctly');
 
+$result = $parser->parse('A [photo:"flower power" width=100] flower');
+$t->is($result, 'A <img src="/images/flower power.jpg" width="100" /> flower', 'A simple InlineObject translates correctly');
 
 $t->info('3 - Parse a string using doctrine inline objects, but with no related record');
 
