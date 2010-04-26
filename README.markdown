@@ -4,6 +4,12 @@ sfInlineObjectPlugin
 Defines a common syntax that can be used to embed objects inline. This text
 can then be parsed and the inline objects rendered.
 
+This is a wrapper for the [InlineObjectParser](http://github.com/weaverryan/InlineObjectParser)
+and adds in such things as:
+
+ * caching
+ * inline Doctrine objects
+
 Consider the following examples:
 
     A picture of a flower: [photo:flower width=100].
