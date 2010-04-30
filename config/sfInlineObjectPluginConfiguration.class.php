@@ -43,7 +43,7 @@ class sfInlineObjectPluginConfiguration extends sfPluginConfiguration
   {
     if ($this->_parser === null)
     {
-      $this->_parser = sfInlineObjectParser::getInstance();
+      $this->_parser = sfInlineObjectParser::createInstance();
     }
     
     return $this->_parser;

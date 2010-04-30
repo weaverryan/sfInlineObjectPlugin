@@ -21,7 +21,7 @@ $t->is(get_class($parser->getCacheDriver()), 'sfNoCache', '->setCacheDriver() se
 $t->info('2 - Test the static bootstrap method');
 require dirname(__FILE__).'/../../bootstrap/functional.php';
 
-$parser = sfInlineObjectParser::getInstance();
+$parser = sfInlineObjectParser::createInstance();
 $t->is(get_class($parser), 'sfInlineObjectTestParser', 'The class is sfInlineObjectTestParser');
 $t->is(count($parser->getTypes()), 2, '->getTypes() begins with two types');
 $t->is(get_class($parser->getCacheDriver()), 'sfFileCache', 'The cache is set correctly');
@@ -31,14 +31,14 @@ $cacheConfig = sfConfig::get('app_inline_object_cache');
 $cacheConfig['enabled'] = false;
 sfConfig::set('app_inline_object_cache', $cacheConfig);
 
-$parser = sfInlineObjectParser::getInstance();
+$parser = sfInlineObjectParser::createInstance();
 $t->is($parser->getCacheDriver(), null, 'The cache driver is null if caching is not enabled');
 
 
 
 $t->info('3 - Parse a string using simple inline objects');
 
-$parser = sfInlineObjectParser::getInstance();
+$parser = sfInlineObjectParser::createInstance();
 $result = $parser->parse('A [photo:flower width=100] flower');
 $t->is($result, 'A <img src="/images/flower.jpg" width="100" /> flower', 'A simple InlineObject translates correctly');
 
@@ -49,7 +49,7 @@ $t->is($result, 'A <img src="/images/flower power.jpg" width="100" /> flower', '
 
 $t->info('4 - Parse a string using doctrine inline objects, but with no related record');
 
-$parser = sfInlineObjectParser::getInstance();
+$parser = sfInlineObjectParser::createInstance();
 
 $result = $parser->parse('The price of "My Product": [product:my-product display=price].');
 $t->is($result, 'The price of "My Product": .', 'The doctrine object was not found, so nothing is output');
@@ -72,7 +72,7 @@ $blog->save();
 
 $t->is(count($blog->Products), 0, 'Sanity check, the blog has no related Products');
 
-$parser = sfInlineObjectParser::getInstance();
+$parser = sfInlineObjectParser::createInstance();
 $parser->setDoctrineRecord($blog);
 $result = $parser->parse($blog->body);
 $blog->refreshRelated('Products');

@@ -193,7 +193,7 @@ class sfInlineObjectParser extends InlineObjectParser
    * 
    * @return sfInlineObjectParser
    */
-  public static function getInstance()
+  public static function createInstance()
   {
     $class = sfConfig::get('app_inline_object_parser_class', 'sfInlineObjectParser');
     $types = sfConfig::get('app_inline_object_types', array());
