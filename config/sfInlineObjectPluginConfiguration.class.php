@@ -14,6 +14,21 @@ class sfInlineObjectPluginConfiguration extends sfPluginConfiguration
     // Register the InlineObject autoloader
     require_once dirname(__FILE__).'/../lib/vendor/InlineObjectParser/lib/InlineObjectAutoloader.php';
     InlineObjectAutoloader::register();
+    
+    $this->dispatcher->connect('context.load_factories', array($this, 'bootstrap'));
+  }
+
+  /**
+   * Listens to the context.load_factories event and:
+   * 
+   *  * Adds InlineObject to the standard helpers
+   */
+  public function bootstrap(sfEvent $event)
+  {
+    $helpers = sfConfig::get('sf_standard_helpers', array());
+    $helpers[] = 'InlineObject';
+    
+    sfConfig::set('sf_standard_helpers', $helpers);
   }
 
   /**
