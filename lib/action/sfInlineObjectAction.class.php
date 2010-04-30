@@ -10,12 +10,15 @@
  */
 class sfInlineObjectAction
 {
+  protected $_action;
+  
   /**
    * Listens to the component.method_not_found event to effectively
    * extend the actions class
    */
   public function listenComponentMethodNotFound(sfEvent $event)
   {
+    $this->_action = $event->getSubject();
     $method = $event['method'];
     $arguments = $event['arguments'];
 
@@ -38,9 +41,9 @@ class sfInlineObjectAction
    * 
    * @return sfInlineObjectParser
    */
-  public function getInlineObjectParser(sfActions $action)
+  public function getInlineObjectParser()
   {
-    return $action->getContext()
+    return $this->_action->getContext()
       ->getConfiguration()
       ->getPluginConfiguration('sfInlineObjectPlugin')
       ->getParser();

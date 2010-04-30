@@ -1,0 +1,1 @@
+<?php echo parse_inline_object($phrase) ?>
