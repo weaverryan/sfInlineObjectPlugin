@@ -15,12 +15,17 @@
  * parse_inline_object('My content [photo:flower]');
  * 
  * @param string $content   The raw content that will be parsed
+ * @param Doctrine_Record $record The optional record to relate the inline objects to
  */
-function parse_inline_object($content, Doctrine_Record $record = null)
+function parse_inline_object($content, $record = null)
 {
-  $parser = sfApplicationConfiguration::getActive()
-    ->getPluginConfiguration('sfInlineObjectPlugin')
-    ->getParser();
+  // Unescape the Doctrine_Record if necessary
+  if ($record instanceof sfOutputEscaperObjectDecorator)
+  {
+    $record = $record->getRawValue();
+  }
+  
+  $parser = get_inline_object_parser();
   
   if ($record !== null)
   {
@@ -29,3 +34,16 @@ function parse_inline_object($content, Doctrine_Record $record = null)
   
   return $parser->parse($content);
 }
+
+/**
+ * Returns the sfInlineObjectParser object
+ * 
+ * @return sfInlineObjectParser
+ */
+function get_inline_object_parser()
+{
+  return sfApplicationConfiguration::getActive()
+    ->getPluginConfiguration('sfInlineObjectPlugin')
+    ->getParser();
+}
+

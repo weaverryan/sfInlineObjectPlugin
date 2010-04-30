@@ -190,6 +190,33 @@ Caching is enabled by defalt, but can be configures via your `app.yml` file:
           options:
             cache_dir:  <?php echo sfConfig::get('sf_app_cache_dir') ?>/inline_objects
 
+Using with sfContentFilterPlugin
+--------------------------------
+
+[sfContentFilterPlugin](http://github.com/weaverryan/sfContentFilterPlugin)
+is a general-purpose content filter that can be used with this plugin.
+For example, by include the content filter plugin, you could convert
+markdown to html, change urls to anchor tags, and parse inline objects
+all at once.
+
+Once you've installed `sfContentFilterPlugin`, you're done! A filter called
+`inline_object` will now be available as a normal filter for use with
+`sfContentFilterPlugin`.
+
+    echo filter_content($content, 'inline_object');
+
+If you're using Doctrine inline objects and need to relate a piece of
+content to a Doctrine record (see above "The complete setup"), you'll
+have one additional step, which can be accomplished in an action or in
+the view:
+
+    // in an action
+    $this->getInlineObjectParser()->setDoctrineRecord($blog);
+    
+    // in the view
+    get_inline_object_parser()->setDoctrineRecord($blog);
+
+The normal `filter_content()` call can then be placed anywhere after this.
 
 The Fine Details
 ----------------

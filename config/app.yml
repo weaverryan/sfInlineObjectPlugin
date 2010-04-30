@@ -15,3 +15,12 @@ all:
       class:    sfFileCache
       options:
         cache_dir:  <?php echo sfConfig::get('sf_app_cache_dir') ?>/inline_objects
+
+# Configuration for if you have sfContentFilterPlugin installed
+  content_filter:
+    filters:
+      url:
+        class:      sfContentFilterUrl
+        cache:      true
+        options:
+          max_text_length: 72            # Urls longer than this will have their text shortened (but the url will still stay the same)

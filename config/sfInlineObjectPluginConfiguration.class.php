@@ -14,8 +14,13 @@ class sfInlineObjectPluginConfiguration extends sfPluginConfiguration
     // Register the InlineObject autoloader
     require_once dirname(__FILE__).'/../lib/vendor/InlineObjectParser/lib/InlineObjectAutoloader.php';
     InlineObjectAutoloader::register();
-    
+
+    // Listener so we can bootstrap the plugin 
     $this->dispatcher->connect('context.load_factories', array($this, 'bootstrap'));
+    
+    // Listener so we can "extend" the actions class
+    $action = new sfInlineObjectAction();
+    $this->dispatcer->connect('component.method_not_found', array($action, 'listenComponentMethodNotFound'));
   }
 
   /**
