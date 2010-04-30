@@ -176,21 +176,11 @@ Caching
 -------
 
 The parsing of strings is done via regular expressions and can drastically
-hurt performance for large text. For that reason, the parsing of strings
-can be cached.
+hurt performance for large text. For that reason, caching is made to be
+easy and harmless.
 
-    $text = 'The price of "My Product": [product:my-product display=price].';
-    $cacheKey = 'product_price_description';
 
-    $parser = new sfInlineObjectParser();
-    echo $parser->parse($text, $cache_key);
-
-The parsing of the string will occur once and then be cached. Only the
-string parsing is cached, so if the inline object itself refers to a dynamic
-object, it won't cause any problems. In other words, there's probably not
-a good reason to NOT use this.
-
-To configure the cache, edit your `app.yml` file:
+Caching is enabled by defalt, but can be configures via your `app.yml` file:
 
     all:
       inline_object:
@@ -199,6 +189,7 @@ To configure the cache, edit your `app.yml` file:
           class:    sfFileCache
           options:
             cache_dir:  <?php echo sfConfig::get('sf_app_cache_dir') ?>/inline_objects
+
 
 The Fine Details
 ----------------
