@@ -27,8 +27,7 @@ Usage
 Once you've defined your object types (see below), using the plugin couldn't
 be easier:
 
-    $parser = new sfInlineObjectParser();
-    echo $parser->parse('A picture of a flower: [photo:flower width=100].');
+    echo parse_inline_object('A picture of a flower: [photo:flower width=100].');
     
     // Example output
     A picture of a flower: <img src="/images/flower.jpg" width="100" />
@@ -170,9 +169,8 @@ on `Blog` to retrieve `Product` records instead of querying for them directly.
 Using the parser itself requires just one extra step:
 
     $blog = Doctrine_Core::getTable('Blog')->find(1);
-    $parser = new sfInlineObjectParser();
-    $parser->setDoctrineRecord($blog);
-    echo $parser->parse($blog->body);
+
+    echo parse_inline_object($blog->body, $blog);
 
 Caching
 -------

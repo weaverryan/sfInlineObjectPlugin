@@ -16,10 +16,16 @@
  * 
  * @param string $content   The raw content that will be parsed
  */
-function parse_inline_object($content)
+function parse_inline_object($content, Doctrine_Record $record = null)
 {
-  return sfApplicationConfiguration::getActive()
+  $parser = sfApplicationConfiguration::getActive()
     ->getPluginConfiguration('sfInlineObjectPlugin')
-    ->getParser()
-    ->parse($content);
+    ->getParser();
+  
+  if ($record !== null)
+  {
+    $parser->setDoctrineRecord($record);
+  }
+  
+  return $parser->parse($content);
 }
