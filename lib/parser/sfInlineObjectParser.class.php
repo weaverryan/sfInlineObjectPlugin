@@ -21,20 +21,6 @@ class sfInlineObjectParser extends InlineObjectParser
     $_doctrineRecord;
 
   /**
-   * Overridden to read the types from config
-   */
-  public function __construct($types = array())
-  {
-    // Merge the given types onto the types from the config
-    $types = array_merge(
-      sfConfig::get('app_inline_object_types', array()),
-      $types
-    );
-
-    parent::__construct($types);
-  }
-
-  /**
    * Overridden to allow for extra setup to be done to support efficient
    * querying for inline objects that refer to Doctrine objects
    * 
@@ -169,23 +155,6 @@ class sfInlineObjectParser extends InlineObjectParser
   }
 
   /**
-   * Initialize the parser
-   */
-  protected function _initialize()
-  {
-    // Setup the cache, if enabled
-    $cacheConfig = sfConfig::get('app_inline_object_cache');
-    if ($cacheConfig['enabled'])
-    {
-      $class = $cacheConfig['class'];
-      $args = isset($cacheConfig['options']) ? $cacheConfig['options'] : array();
-      
-      $cache = new $class($args);
-      $this->setCacheDriver($cache);
-    }
-  }
-
-  /**
    * Returns the relation name (if one exists) that will allow us to retrieve
    * objects of the targetModel from the sourceModel.
    * 
@@ -214,5 +183,33 @@ class sfInlineObjectParser extends InlineObjectParser
     }
     
     return false;
+  }
+
+  /**
+   * This is not a singleton accessor, but rather a place to house the logic
+   * for this class to bootstrap itself based on the application configuration
+   * 
+   * A better way to retrieve this class would be the sfInlineObjectPluginConfiguration
+   * 
+   * @return sfInlineObjectParser
+   */
+  public static function getInstance()
+  {
+    $class = sfConfig::get('app_inline_object_parser_class', 'sfInlineObjectParser');
+    $types = sfConfig::get('app_inline_object_types', array());
+    
+    $parser = new $class($types);
+
+    $cacheConfig = sfConfig::get('app_inline_object_cache');
+    if ($cacheConfig['enabled'])
+    {
+      $class = $cacheConfig['class'];
+      $args = isset($cacheConfig['options']) ? $cacheConfig['options'] : array();
+      
+      $cache = new $class($args);
+      $parser->setCacheDriver($cache);
+    }
+
+    return $parser;
   }
 }

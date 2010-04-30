@@ -1,6 +1,8 @@
 all:
   inline_object:
 
+    parser_class:    sfInlineObjectParser    # Class used by default for the parser
+
     # Specify the array of inline object types that can be embedded
     # For example, the below example would process the [photo:name] syntax
     # through the InlineObjectPhoto class.
