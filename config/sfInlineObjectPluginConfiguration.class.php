@@ -20,7 +20,7 @@ class sfInlineObjectPluginConfiguration extends sfPluginConfiguration
     
     // Listener so we can "extend" the actions class
     $action = new sfInlineObjectAction();
-    $this->dispatcer->connect('component.method_not_found', array($action, 'listenComponentMethodNotFound'));
+    $this->dispatcher->connect('component.method_not_found', array($action, 'listenComponentMethodNotFound'));
   }
 
   /**
