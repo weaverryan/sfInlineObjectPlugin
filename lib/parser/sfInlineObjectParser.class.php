@@ -147,9 +147,9 @@ class sfInlineObjectParser extends InlineObjectParser
    * will attempt to retrieve those objects through a true relationship
    * on the given Doctrine_Record
    * 
-   * @param Doctrine_Record $record The record that sources the raw text
+   * @param Doctrine_Record or false $record The record that sources the raw text
    */
-  public function setDoctrineRecord(Doctrine_Record $record)
+  public function setDoctrineRecord($record)
   {
     $this->_doctrineRecord = $record;
   }
