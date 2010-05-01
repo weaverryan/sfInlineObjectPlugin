@@ -9,6 +9,8 @@
  */
 class sfInlineObjectPluginConfiguration extends sfPluginConfiguration
 {
+  protected $_parser;
+
   public function initialize()
   {
     // Register the InlineObject autoloader
