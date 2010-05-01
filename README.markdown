@@ -21,6 +21,29 @@ Consider the following examples:
 All the developer needs to do is define a syntax (e.g. `photo` or `product`)
 and a class (of type `InlineObjectType`) that will render matches of that type.
 
+Installation
+------------
+
+With git:
+
+    git submodule add git://github.com/weaverryan/sfInlineObjectPlugin.git plugins/sfInlineObjectPlugin
+    git submodule init
+    git submodule update
+
+With subversion
+
+    svn propedit svn:externals plugins
+    
+    // In the editor, add the following entry and then save
+    sfInlineObjectPlugin https://svn.github.com/weaverryan/sfInlineObjectPlugin.git
+    
+    svn up
+
+In your `config/ProjectConfiguration.class.php` file, make sure you have
+the plugin enabled.
+
+    $this->enableAllPluginsExcept('sfPropelPlugin');
+
 Usage
 -----
 
