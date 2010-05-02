@@ -48,7 +48,7 @@ With subversion
 In your `config/ProjectConfiguration.class.php` file, make sure you have
 the plugin enabled.
 
-    $this->enableAllPluginsExcept('sfPropelPlugin');
+    $this->enablePlugins('sfInlineObjectPlugin');
 
 Usage
 -----
