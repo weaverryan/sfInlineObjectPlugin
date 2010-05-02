@@ -39,6 +39,12 @@ With subversion
     
     svn up
 
+>Because github does not yet support git submodules in svn, if using the
+>svn method, you'll also need to manually download the
+>[InlineObjectParser](http://github.com/weaverryan/InlineObjectParser)
+>library and place it in the `lib/vendor/InlineObjectParser` directory
+>of the plugin.
+
 In your `config/ProjectConfiguration.class.php` file, make sure you have
 the plugin enabled.
 
