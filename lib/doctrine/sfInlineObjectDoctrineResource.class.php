@@ -73,10 +73,19 @@ class sfInlineObjectDoctrineResource
    */
   protected function _getQueryForObjects($keys)
   {
-    $q = Doctrine_Core::getTable($this->_model)
-      ->createQuery('a')
-      ->whereIn('a.'.$this->_keyColumn, array_unique($keys))
-      ->orderBy('a.'.$this->_keyColumn.' ASC');
+    $tbl = Doctrine_Core::getTable($this->_model);
+    
+    $keys = array_unique($keys);
+    if (method_exists($tbl, 'getQueryForInlineObjects'))
+    {
+      $q = $tbl->getQueryForInlineObjects($keys, $this->_keyColumn);
+    }
+    else
+    {
+      $q = $tbl->createQuery('a')
+        ->whereIn('a.'.$this->_keyColumn, $keys)
+        ->orderBy('a.'.$this->_keyColumn.' ASC');
+    }
 
     return $q;
   }
