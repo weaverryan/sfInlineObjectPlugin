@@ -88,13 +88,13 @@ class sfInlineObjectParser extends InlineObjectParser
      * Iterate through all of the objects and assign resources where necessary
      */
     $renderedObjects = array();
-    foreach ($objects as $object)
+    foreach ($objects as $key => $object)
     {
       if ($object instanceof sfInlineObjectDoctrineType)
       {
         $object->setDoctrineResource($resources[get_class($object)]);
       }
-      $renderedObjects[] = $object->render();
+      $renderedObjects[$key] = $object->render();
     }
 
     return $this->_combineTextAndRenderedObjects($text, $renderedObjects);
