@@ -24,13 +24,13 @@ and a class (of type `InlineObjectType`) that will render matches of that type.
 Installation
 ------------
 
-With git:
+### Git
 
     git submodule add git://github.com/weaverryan/sfInlineObjectPlugin.git plugins/sfInlineObjectPlugin
     git submodule init
     git submodule update
 
-With subversion
+### Subversion
 
     svn propedit svn:externals plugins
     
@@ -45,10 +45,27 @@ With subversion
 >library and place it in the `lib/vendor/InlineObjectParser` directory
 >of the plugin.
 
+### Setup
+
 In your `config/ProjectConfiguration.class.php` file, make sure you have
 the plugin enabled.
 
-    $this->enablePlugins('sfInlineObjectPlugin');
+    public function setup()
+    {
+      // ...
+      $this->enablePlugins('sfInlineObjectPlugin');
+    }
+
+### Optional configuration
+
+If you downloaded the [InlineObjectParser](http://github.com/weaverryan/InlineObjectParser)
+separately, you can specify the path to the directory in `config/ProjectConfiguration.class.php`:
+
+    public function setup()
+    {
+      // ...
+      sfConfig::set('inline_object_dir', '/path/to/InlineObjectParser');
+    }
 
 Usage
 -----

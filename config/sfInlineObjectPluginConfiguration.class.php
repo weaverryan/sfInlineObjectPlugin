@@ -11,10 +11,22 @@ class sfInlineObjectPluginConfiguration extends sfPluginConfiguration
 {
   protected $_parser;
 
+  /**
+   * Use this to optionally override the path to the InlineObject library
+   */
+  public static $inlineObjectPath;
+
   public function initialize()
   {
-    // Register the InlineObject autoloader
-    require_once dirname(__FILE__).'/../lib/vendor/InlineObjectParser/lib/InlineObjectAutoloader.php';
+    $inlineObjectPath = sfConfig::get('inline_object_dir', dirname(__FILE__).'/../lib/vendor/InlineObjectParser');
+
+    $autoloader = $inlineObjectPath.'/lib/InlineObjectAutoloader.php';
+    if (!file_exists($autoloader))
+    {
+      throw new sfException('InlineObject library autoloader not found at '.$autoloader);
+    }
+
+    require_once $autoloader;
     InlineObjectAutoloader::register();
 
     // Listener so we can bootstrap the plugin 
