@@ -3,5 +3,10 @@ all:
     parser_class:  sfInlineObjectTestParser    # Class used by default for the parser
   
     types:
-      photo:    InlineObjectPhoto
-      product:  InlineObjectProduct
+      photo:
+        class:      InlineObjectPhoto
+      product:
+        class:      InlineObjectProduct
+        model:      Product
+        key_column: slug
+        

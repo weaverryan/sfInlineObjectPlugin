@@ -1,28 +1,20 @@
 <?php
 
 // Testing class that refers to a doctrine object
-class InlineObjectProduct extends sfInlineObjectDoctrineType
+class InlineObjectProduct extends sfInlineObjectType
 {
-  public function getModel()
+  public function render($name, $arguments)
   {
-    return 'Product';
-  }
-  
-  public function getKeyColumn()
-  {
-    return 'slug';
-  }
-  
-  public function render()
-  {
-    $product = $this->getRelatedObject();
+    $product = $this->getRelatedObject($name);
     
     if (!$product)
     {
       return '';
     }
 
-    if ($field = $this->getOption('display'))
+    $field = isset($arguments['display']) ? $arguments['display'] : false;
+
+    if ($field)
     {
       return $product->get($field);
     }

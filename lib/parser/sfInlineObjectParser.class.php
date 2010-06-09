@@ -32,18 +32,21 @@ class sfInlineObjectParser extends InlineObjectParser
     $parsed = $this->parseTypes($text, $key);
     
     $text = $parsed[0];
-    $objects = $parsed[1];
+    $inlineObjects = $parsed[1];
 
     /*
      * Iterate through all of the inline objects and collect a list of the
      * Doctrine inline objects and their keys
      */
     $doctrineTypes = array();
-    foreach ($objects as $object)
+    foreach ($inlineObjects as $inlineObject)
     {
-      if ($object instanceof sfInlineObjectDoctrineType)
+      $typeObject = $this->getType($inlineObject['type']);
+      if ($typeObject->hasRelatedDoctrineObject())
       {
         $className = get_class($object);
+
+        // if this is the first of this type, setup the array for the type
         if (!isset($doctrineTypes[$className]))
         {
           $doctrineTypes[$className] = array(
@@ -52,8 +55,9 @@ class sfInlineObjectParser extends InlineObjectParser
             'keys'      => array(),
           );
         }
-        
-        $doctrineTypes[$className]['keys'][] = $object->getName();
+
+        // add the current name/key to the array of keys
+        $doctrineTypes[$className]['keys'][] = $inlineObject['name'];
       }
     }
     
@@ -65,6 +69,12 @@ class sfInlineObjectParser extends InlineObjectParser
      */
     foreach ($doctrineTypes as $typeClass => $doctrineType)
     {
+      /**
+       * if we were given a base object to relate inline objects to, and if
+       * the given model uses the sfInlineObjectContainerTemplate, then
+       * use the more powerful related resource object to pull the objects
+       * through that relationship.
+       */
       if ($this->_doctrineRecord && $relation = $this->getRelation(get_class($this->_doctrineRecord), $doctrineType['model']))
       {
         $resources[$typeClass] = sfInlineObjectDoctrineRelatedResource::getInstance(
@@ -75,26 +85,33 @@ class sfInlineObjectParser extends InlineObjectParser
       }
       else
       {
+        // use the normal doctrine resource which attempts to minimize queries
         $resources[$typeClass] = new sfInlineObjectDoctrineResource(
           $doctrineType['model'],
           $doctrineType['keyColumn']
         );
       }
-      
+
+      // tell the resource to query out and prepare for the given related objects
       $resources[$typeClass]->prepareObjects($doctrineType['keys']);
     }
     
     /*
-     * Iterate through all of the objects and assign resources where necessary
+     * Iterate through the original array and assign records where necessary
      */
     $renderedObjects = array();
-    foreach ($objects as $key => $object)
+    foreach ($inlineObjects as $key => $inlineObject)
     {
-      if ($object instanceof sfInlineObjectDoctrineType)
+      $typeObject = $this->getType($inlineObject['type']);
+      if ($typeObject->hasRelatedDoctrineObject())
       {
-        $object->setDoctrineResource($resources[get_class($object)]);
+        $typeObject->setDoctrineResource($resources[get_class($typeObject)]);
       }
-      $renderedObjects[$key] = $object->render();
+
+      $renderedObjects[$key] = $typeObject->render(
+        $inlineObject['name'],
+        $inlineObject['arguments']
+      );
     }
 
     return $this->_combineTextAndRenderedObjects($text, $renderedObjects);
@@ -196,10 +213,34 @@ class sfInlineObjectParser extends InlineObjectParser
   public static function createInstance()
   {
     $class = sfConfig::get('app_inline_object_parser_class', 'sfInlineObjectParser');
-    $types = sfConfig::get('app_inline_object_types', array());
-    
-    $parser = new $class($types);
+    $parser = new $class();
 
+    // add the types to the parser
+    $types = sfConfig::get('app_inline_object_types', array());
+    foreach ($types as $key => $typeConfig)
+    {
+      if (!is_array($typeConfig))
+      {
+        // help out with the old syntax
+        throw new sfException(
+          'The inline_object_types config must now specify an array of
+          options instead of just a scalar value (which was the class):
+          all:
+            inline_object:
+              types:
+                my_type:
+                  class:    myInlineObjectTyepe'
+        );
+      }
+
+      $class = isset($typeConfig['class']) ? $typeConfig['class'] : 'sfInlineObjectType';
+      unset($typeConfig['class']);
+
+      $type = new $class($key, $typeConfig);
+      $parser->addType($type);
+    }
+
+    // configure the cache
     $cacheConfig = sfConfig::get('app_inline_object_cache');
     if ($cacheConfig['enabled'])
     {

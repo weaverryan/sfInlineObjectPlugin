@@ -2,10 +2,10 @@
 
 class InlineObjectPhoto extends sfInlineObjectType
 {
-  public function render()
+  public function render($name, $arguments)
   {
-    $attrs = InlineObjectToolkit::arrayToAttributes($this->getOptions());
+    $attrs = InlineObjectToolkit::arrayToAttributes($arguments);
 
-    return sprintf('<img src="/images/%s.jpg"%s />', $this->getName(), $attrs);
+    return sprintf('<img src="/images/%s.jpg"%s />', $name, $attrs);
   }
 }

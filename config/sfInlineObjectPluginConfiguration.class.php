@@ -18,6 +18,8 @@ class sfInlineObjectPluginConfiguration extends sfPluginConfiguration
 
   public function initialize()
   {
+    sfOutputEscaper::markClassAsSafe('sfInlineObjectType');
+
     $inlineObjectPath = sfConfig::get('inline_object_dir', dirname(__FILE__).'/../lib/vendor/InlineObjectParser');
 
     $autoloader = $inlineObjectPath.'/lib/InlineObjectAutoloader.php';
