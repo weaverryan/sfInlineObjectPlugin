@@ -79,15 +79,31 @@ class sfInlineObjectType extends InlineObjectType
 
     if ($this->_doctrineResource)
     {
-      return $this->_doctrineResource->getObject($name);
+      $obj = $this->_doctrineResource->getObject($name);
     }
     else
     {
-      return Doctrine_Core::getTable($model)
+      $obj = Doctrine_Core::getTable($model)
         ->createQuery('a')
         ->where('a.'.$keyColumn.' = ?', $name)
         ->fetchOne();
     }
+
+    // throw an event if the object was not located
+    if (!$obj)
+    {
+      sfProjectConfiguration::getActive()
+        ->getEventDispatcher()
+        ->notify(new sfEvent($this, 'inline_object.related_object_not_found', array(
+          'type'        => $this->getName(),
+          'model'       => $model,
+          'key_column'  => $keyColumn,
+          'name'        => $name,
+        )
+      ));
+    }
+
+    return $obj;
   }
 
   /**
