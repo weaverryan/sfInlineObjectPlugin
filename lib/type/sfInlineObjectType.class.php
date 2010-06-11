@@ -23,29 +23,33 @@ class sfInlineObjectType extends InlineObjectType
    *
    *  * model: The Doctrine model name to use as a datasource
    *  * key_column The column on the above model to use as the key column
-   *  * template A partial (module/template) to use to render this object
+   *  * partial A partial (module/partial) to use to render this object
    */
 
 
   /**
-   * Attempts to render the object by using the _template property.
+   * Attempts to render the object by using the partial option.
    *
    * @return string
    */
   public function render($name, $arguments)
   {
-    if (!$this->getOption('template'))
+    if (!$this->getOption('partial'))
     {
       throw new sfException(sprintf(
         'The inline object "%s" cannot be rendered. Either specify a
-        template or override render() in a subclass.',
+        partial or override render() in a subclass.',
         $name
       ));
     }
 
     sfApplicationConfiguration::getActive()->loadHelpers('Partial');
 
-    return get_partial($this->getOption('template'), array('inline_object' => $this));
+    return get_partial($this->getOption('partial'), array(
+      'inline_object' => $this,
+      'name'          => $name,
+      'arguments'     => $arguments,
+    ));
   }
 
   /**
