@@ -64,9 +64,13 @@ class sfInlineObjectType extends InlineObjectType
   {
     $model = $this->getOption('model');
     $keyColumn = $this->getOption('key_column');
-    if (!$model || !$keyColumn)
+    if (!$model)
     {
-      throw new sfException('Both the "model" and "key_column" of an inline object must be defined to retrieve a related object.');
+      throw new sfException(sprintf('getRelatedObject() on inline object of type "%s" cannot be called: it is missing the "model" option.', $this->getName()));
+    }
+    if (!$keyColumn)
+    {
+      throw new sfException(sprintf('getRelatedObject() on inline object of type "%s" cannot be called: it is missing the "key_column" option.', $this->getName()));
     }
 
     if ($this->_doctrineResource)

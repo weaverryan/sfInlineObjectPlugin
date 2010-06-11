@@ -44,14 +44,14 @@ class sfInlineObjectParser extends InlineObjectParser
       $typeObject = $this->getType($inlineObject['type']);
       if ($typeObject->hasRelatedDoctrineObject())
       {
-        $className = get_class($object);
+        $className = get_class($typeObject);
 
         // if this is the first of this type, setup the array for the type
         if (!isset($doctrineTypes[$className]))
         {
           $doctrineTypes[$className] = array(
-            'model'     => $object->getModel(),
-            'keyColumn' => $object->getKeyColumn(),
+            'model'     => $typeObject->getOption('model'),
+            'keyColumn' => $typeObject->getOption('key_column'),
             'keys'      => array(),
           );
         }
