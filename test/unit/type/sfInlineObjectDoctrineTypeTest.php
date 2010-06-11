@@ -2,7 +2,7 @@
 
 require dirname(__FILE__).'/../../bootstrap/doctrine.php';
 
-$t = new lime_test(2);
+$t = new lime_test(4);
 
 $t->info('1 - Test ->getRelatedObject()');
   Doctrine_Core::getTable('Product')->createQuery('p')->delete()->execute();
