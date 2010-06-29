@@ -8,7 +8,13 @@ all:
     # through the InlineObjectPhoto class.
     
     # types:
-    #   photo:     InlineObjectPhoto
+    #   photo:
+    #     class:   InlineObjectPhoto
+    #
+    #   product:
+    #     partial: product/show
+    #     model:   Photo
+    #     key_column: id
 
     cache:
       enabled:  true
