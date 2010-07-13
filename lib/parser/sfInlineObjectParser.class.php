@@ -34,87 +34,74 @@ class sfInlineObjectParser extends InlineObjectParser
     $text = $parsed[0];
     $inlineObjects = $parsed[1];
 
-    /*
-     * Iterate through all of the inline objects and collect a list of the
-     * Doctrine inline objects and their keys
-     */
-    $doctrineTypes = array();
-    foreach ($inlineObjects as $inlineObject)
-    {
-      $typeObject = $this->getType($inlineObject['type']);
-      if ($typeObject->hasRelatedDoctrineObject())
-      {
-        $className = get_class($typeObject);
-
-        // if this is the first of this type, setup the array for the type
-        if (!isset($doctrineTypes[$className]))
-        {
-          $doctrineTypes[$className] = array(
-            'model'     => $typeObject->getOption('model'),
-            'keyColumn' => $typeObject->getOption('key_column'),
-            'keys'      => array(),
-          );
-        }
-
-        // add the current name/key to the array of keys
-        $doctrineTypes[$className]['keys'][] = $inlineObject['name'];
-      }
-    }
-    
+    // iterate through each inline object andset its doctrine resource (if necessary)
     $resources = array();
-
-    /*
-     * Iterate through all of the Doctrine types and instantiate the resource
-     * that will be used to retrieve those doctrine objects
-     */
-    foreach ($doctrineTypes as $typeClass => $doctrineType)
-    {
-      /**
-       * if we were given a base object to relate inline objects to, and if
-       * the given model uses the sfInlineObjectContainerTemplate, then
-       * use the more powerful related resource object to pull the objects
-       * through that relationship.
-       */
-      if ($this->_doctrineRecord && $relation = $this->getRelation(get_class($this->_doctrineRecord), $doctrineType['model']))
-      {
-        $resources[$typeClass] = sfInlineObjectDoctrineRelatedResource::getInstance(
-          $this->_doctrineRecord,
-          $relation,
-          $doctrineType['keyColumn']
-        );
-      }
-      else
-      {
-        // use the normal doctrine resource which attempts to minimize queries
-        $resources[$typeClass] = new sfInlineObjectDoctrineResource(
-          $doctrineType['model'],
-          $doctrineType['keyColumn']
-        );
-      }
-
-      // tell the resource to query out and prepare for the given related objects
-      $resources[$typeClass]->prepareObjects($doctrineType['keys']);
-    }
-    
-    /*
-     * Iterate through the original array and assign records where necessary
-     */
-    $renderedObjects = array();
     foreach ($inlineObjects as $key => $inlineObject)
     {
       $typeObject = $this->getType($inlineObject['type']);
       if ($typeObject->hasRelatedDoctrineObject())
       {
-        $typeObject->setDoctrineResource($resources[get_class($typeObject)]);
-      }
+        $typeClass = get_class($typeObject);
 
-      $renderedObjects[$key] = $typeObject->render(
-        $inlineObject['name'],
-        $inlineObject['arguments']
-      );
+        // make sure that we've got the resource in our resources array
+        if (!isset($resources[$typeClass]))
+        {
+          $resources[$typeClass] = array(
+            'resource'  => $this->_createDoctrineResource($typeObject->getOption('model'), $typeObject->getOption('key_column')),
+            'keys'      => array(),
+          );
+        }
+
+        // add this object's name to the list of keys for the resource
+        $resources[$typeClass]['keys'][] = $inlineObject['name'];
+
+        // set the resource on the object
+        $typeObject->setDoctrineResource($resources[$typeClass]['resource']);
+      }
     }
 
+    // initialize each resource with the array of keys
+    foreach ($resources as $resourceArr)
+    {
+      $resourceArr['resource']->prepareObjects($resourceArr['keys']);
+    }
+
+    // Create an array of the text from the rendered objects
+    $renderedObjects = $this->_renderInlineObjectsFromArray($inlineObjects);
+
     return $this->_combineTextAndRenderedObjects($text, $renderedObjects);
+  }
+
+  /**
+   * Creates a new sfInlineObjectDoctrineResource|sfInlineObjectDoctrineRelatedResource
+   * instance for the given inline object type
+   *
+   * @return sfInlineObjectDoctrineResource
+   */
+  protected function _createDoctrineResource($relatedModel, $keyColumn)
+  {
+    /**
+     * if we were given a base object to relate inline objects to, and if
+     * the given model uses the sfInlineObjectContainerTemplate, then
+     * use the more powerful related resource object to pull the objects
+     * through that relationship.
+     */
+    if ($this->_doctrineRecord && $relation = $this->getRelation(get_class($this->_doctrineRecord), $relatedModel))
+    {
+      return sfInlineObjectDoctrineRelatedResource::getInstance(
+        $this->_doctrineRecord,
+        $relation,
+        $keyColumn
+      );
+    }
+    else
+    {
+      // use the normal doctrine resource which attempts to minimize queries
+      return new sfInlineObjectDoctrineResource(
+        $relatedModel,
+        $keyColumn
+      );
+    }
   }
 
   /**
