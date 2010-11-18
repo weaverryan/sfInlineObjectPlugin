@@ -62,6 +62,16 @@ class sfInlineObjectDoctrineRelatedResource extends sfInlineObjectDoctrineResour
     
     return self::$_instances[$instanceName];
   }
+  
+  /**
+   * Returns the related doctrine object
+   * 
+   * @return Doctrine_Record
+   */
+  public function getRecord()
+  {
+    return $this->_record;
+  }
 
   /**
    * Given an array of keys, this creates any new links from the $_record
